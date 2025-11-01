@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Impede o formulário de recarregar a página
+            event.preventDefault();
 
             const email = document.getElementById('login-email').value;
             const senha = document.getElementById('login-senha').value;
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const senha = document.getElementById('cadastro-senha').value;
 
             try {
-                // Envia os dados para o /cadastro no nosso server.js
+                // Envia os dados para o /cadastro no server.js
                 const response = await fetch('/cadastro', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -86,11 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
-                if (response.ok) { // Status 201
-                    alert(data.message); // "Usuário cadastrado com sucesso!"
+                if (response.ok) {
+                    alert(data.message);
                     wrapper.classList.remove('active'); // Volta para a tela de login
-                } else { // Status 400 ou 500
-                    alert(data.message); // "Este e-mail já está cadastrado."
+                } else {
+                    alert(data.message);
                 }
             } catch (error) {
                 console.error('Erro no cadastro:', error);

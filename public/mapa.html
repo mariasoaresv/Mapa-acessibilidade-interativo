@@ -90,10 +90,12 @@
                 <div class="popup-detalhes-colunas">
 
                     <div class="popup-detalhes-col-esq">
+                        <h6>Foto do local:</h6>
                         <label for="popup-detalhes-foto" class="popup-detalhes-upload-area">
-                            <ion-icon name="image-outline"></ion-icon>
+                            <img src="/img/upload.png">
                         </label>
-                        <input type="file" id="popup-detalhes-foto" accept="image/*" class="popup-escondido">
+                        <input type="file" id="popup-detalhes-foto" accept="image/*" class="popup-file-btn">
+                        <p>Clique na imagem acima para carregar seu arquivo</p>
                     </div>
 
                     <div class="popup-detalhes-col-dir">
@@ -120,6 +122,12 @@
             </form>
         </div>
     </div>
+
+    <div id="editar-excluir-container" class="popup-escondido">
+        <button id="editar"><ion-icon name="md-create"></ion-icon>Editar detalhes </button>
+        <button id="excluir"><ion-icon name="md-trash"></ion-icon>Excluir ponto</button>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-geosearch@3.11.0/dist/geosearch.umd.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>

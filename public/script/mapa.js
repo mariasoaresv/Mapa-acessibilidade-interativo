@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Lógica para mostrar o nome do usuário logado
     const userDataJson = sessionStorage.getItem('usuarioLogado');
 
     if (userDataJson) {
@@ -12,22 +13,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const primeiroNome = partesDoNome[0];
             
             nomeUsuarioElement.textContent = primeiroNome + '!'; 
-        } else {
-            console.error('Elemento #nome-usuario não foi encontrado ou userData.username não existe.');
         }
-
     } else {
         alert('Por favor, faça login para acessar o mapa.');
-        console.log('Nenhum usuário logado encontrado na sessão. Redirecionando...');
         window.location.href = 'index.html';
         return; 
     }
-
+    
+    // Mapa e pesquisa de endereço
     const geoSearchProvider = new GeoSearch.OpenStreetMapProvider();
+    let map;
 
     if (document.getElementById('mapa-container')) {
-        
-        const map = L.map('mapa-container').setView([20, 0], 2); 
+        map = L.map('mapa-container').setView([20, 0], 2);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -39,24 +37,52 @@ document.addEventListener('DOMContentLoaded', () => {
             showMarker: false, 
             autoClose: true,
             keepResult: true,
+            searchLabel: 'Digite um endereço...'
         });
         map.addControl(searchControl);
 
-        window.myMap = map;
+        window.myMap = map; 
     }
 
+    // Popups de detalhes, manipualação de ícones e marcadores
+
+    // Popup detalhes
     const popupContainer = document.getElementById('popup-detalhes-container');
-    
     const popupConteudo = document.querySelector('.popup-detalhes-conteudo'); 
-    
     const popupForm = document.getElementById('popup-detalhes-form');
     const popupCloseBtn = document.getElementById('popup-detalhes-fechar');
     const popupIconImg = document.getElementById('popup-detalhes-icone');
     
-    let marcadorSendoEditado = null;
+    // Imagem preview
+    const fileInput = document.getElementById('popup-detalhes-foto');
+    const previewImage = document.querySelector('.popup-detalhes-upload-area img');
+    const placeholderSrc = previewImage.src; 
+
+    // Manipulação de marcadores e ícones
+    const menuContexto = document.getElementById('editar-excluir-container');
+    const btnMenuEditar = document.getElementById('editar');
+    const btnMenuExcluir = document.getElementById('excluir');
+
+    let marcadorAtivo = null;
+    
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0]; 
+        if (file) {
+            const reader = new FileReader(); 
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
 
     if (window.myMap) {
-        const map = window.myMap;
+
+        map.on('click', () => {
+            menuContexto.classList.add('popup-escondido');
+        });
+
         const mapContainer = document.getElementById('mapa-container');
         const icons = document.querySelectorAll('.draggable-icon');
 
@@ -73,6 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mapContainer.addEventListener('drop', (e) => {
             e.preventDefault();
+
+            menuContexto.classList.add('popup-escondido');
 
             const data = JSON.parse(e.dataTransfer.getData('application/json'));
             const iconSrc = data.src;
@@ -96,98 +124,135 @@ document.addEventListener('DOMContentLoaded', () => {
                 foto: null
             };
 
-            marcadorSendoEditado = marker;
+            marcadorAtivo = marker;
 
             popupForm.reset(); 
+            previewImage.src = placeholderSrc;
             popupIconImg.src = iconSrc; 
-                             
-            popupContainer.classList.remove('ativo');
             
-
+            popupContainer.classList.remove('popup-escondido'); 
             popupConteudo.classList.add('ativo'); 
-
-            // 6. Busca de endereço foi REMOVIDA
             
 
-            // --- O que acontece ao CLICAR (Botão Esquerdo) ---
-            marker.on('click', () => {
-                const dados = marker.dados;
+            // Clique ESQUERDO no marcador/icone
+            marker.on('click', (e) => {
+                L.DomEvent.stopPropagation(e);
+                menuContexto.classList.add('popup-escondido');
                 
-                // Se o marcador ainda não tem título, REABRE o popup de edição
-                if (!dados.titulo) {
-                    marcadorSendoEditado = marker;
-                    
-                    // Preenche o popup
-                    document.getElementById('popup-detalhes-titulo').value = dados.titulo;
-                    document.getElementById('popup-detalhes-observacao').value = dados.descricao;
-                    document.getElementById('popup-detalhes-icone').src = marker.options.icon.options.iconUrl;
+                const dados = marker.dados;
 
-                    
-                    popupContainer.classList.remove('popup-escondido'); // Mostra o fundo
-                    
-                    // --- MUDANÇA 3: Adiciona a classe .ativo aqui também ---
-                    popupConteudo.classList.add('ativo'); 
-                    
+                if (!dados.titulo) {
                     return;
                 }
 
-                // Se JÁ TEM título, mostra o balãozinho de visualização
-                let popupConteudo = `<b>${dados.titulo}</b><br>${dados.descricao}`;
+                let popupConteudoHTML = `<b>${dados.titulo}</b><br>${dados.descricao}`;
 
+                if (dados.foto) {
+                    popupConteudoHTML += `<br><img src="${dados.foto}" alt="${dados.titulo}" style="width: 100px; margin-top: 10px; border-radius: 5px;">`;
+                }
 
                 L.popup()
                     .setLatLng(marker.getLatLng())
-                    .setContent(popupConteudo)
+                    .setContent(popupConteudoHTML)
                     .openOn(map);
             });
 
 
-            // --- O que acontece ao CLICAR (Botão Direito) ---
-            marker.on('contextmenu', (e) => { // 'contextmenu' é o clique direito
-                if (confirm('Deseja excluir este ícone?')) {
-                    map.removeLayer(marker); // Remove o marcador do mapa
-                }
+            // Clique DIREITO no marcador/icone
+            marker.on('contextmenu', (e) => { 
+                L.DomEvent.preventDefault(e);
+                L.DomEvent.stopPropagation(e);
+
+                marcadorAtivo = marker;
+
+                // Posiciona o menu de manipulação próximo ao cursor
+                const mapRect = mapContainer.getBoundingClientRect();
+                const point = e.containerPoint;
+                menuContexto.style.left = `${mapRect.left + point.x}px`;
+                menuContexto.style.top = `${mapRect.top + point.y}px`;
+
+                menuContexto.classList.remove('popup-escondido');
             });
         });
     }
 
-    // O que acontece quando clicamos em "Enviar" no popup de Detalhes
+    // Botões de manipulação dos marcadores (Editar / Excluir)
+
+    // Editar
+    btnMenuEditar.addEventListener('click', () => {
+        if (!marcadorAtivo) return;
+
+        const dados = marcadorAtivo.dados;
+        
+        document.getElementById('popup-detalhes-titulo').value = dados.titulo;
+        document.getElementById('popup-detalhes-observacao').value = dados.descricao;
+        document.getElementById('popup-detalhes-icone').src = marcadorAtivo.options.icon.options.iconUrl;
+
+        if (dados.foto) {
+            previewImage.src = dados.foto;
+        } else {
+            previewImage.src = placeholderSrc;
+        }
+        fileInput.value = "";
+
+        popupContainer.classList.remove('popup-escondido');
+        popupConteudo.classList.add('ativo');
+
+        menuContexto.classList.add('popup-escondido');
+    });
+
+    // Excluir
+    btnMenuExcluir.addEventListener('click', () => {
+        if (!marcadorAtivo) return;
+
+        // Remove o marcador do mapa
+        map.removeLayer(marcadorAtivo);
+        
+        menuContexto.classList.add('popup-escondido');
+        marcadorAtivo = null;
+    });
+
+
+    // Botões e ações do popup de detalhes
+
+    // Botão de enviar
     popupForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        if (marcadorSendoEditado) {
-            // Pega os dados do formulário
+        if (marcadorAtivo) {
             const titulo = document.getElementById('popup-detalhes-titulo').value;
             const observacao = document.getElementById('popup-detalhes-observacao').value;
 
-            // Salva os dados DENTRO do marcador
-            marcadorSendoEditado.dados.titulo = titulo;
-            marcadorSendoEditado.dados.descricao = observacao;
-
-            // Esconde o popup
-            popupContainer.classList.add('popup-escondido'); // Esconde o fundo
+            marcadorAtivo.dados.titulo = titulo;
+            marcadorAtivo.dados.descricao = observacao;
             
-            // --- MUDANÇA 4: Remove a classe .ativo para o popup "encolher" ---
+            if (fileInput.files[0]) { 
+                marcadorAtivo.dados.foto = previewImage.src; 
+            }
+
+            popupContainer.classList.add('popup-escondido');
             popupConteudo.classList.remove('ativo'); 
             
-            marcadorSendoEditado = null; // Limpa a variável
+            popupForm.reset();
+            previewImage.src = placeholderSrc;
+
+            marcadorAtivo = null; 
         }
     });
 
-    // O que acontece quando clicamos no "X" para fechar
+    // Botão X de fechar
     popupCloseBtn.addEventListener('click', () => {
-        popupContainer.classList.add('popup-escondido'); // Esconde o fundo
-        
-        // --- MUDANÇA 4 (Repetida): Remove a classe .ativo ---
+        popupContainer.classList.add('popup-escondido');
         popupConteudo.classList.remove('ativo');
         
-        // Se estávamos *criando* um novo ícone (e não editando),
-        // devemos removê-lo do mapa, pois foi cancelado.
-        if (marcadorSendoEditado && !marcadorSendoEditado.dados.titulo) { // Se não tem título, é novo
-            map.removeLayer(marcadorSendoEditado);
+        if (marcadorAtivo && !marcadorAtivo.dados.titulo) { 
+            map.removeLayer(marcadorAtivo);
         }
 
-        marcadorSendoEditado = null; // Limpa a variável
+        popupForm.reset();
+        previewImage.src = placeholderSrc;
+
+        marcadorAtivo = null; 
     });
 
-}); // Fim do 'DOMContentLoaded'
+});

@@ -1,5 +1,5 @@
 const express = require('express');
-const session = require('express-session'); //importando os pacotes
+const session = require('express-session');
 const bcrypt = require('bcrypt');
 
 
@@ -17,7 +17,7 @@ app.use(session({
 
 app.use(express.static('public'));
 
-const users = []; //Banco de dados "falso"
+const users = []; //Banco de dados "falso"/temporário (ele é apagado assim que o servidor é reiniciado)
 
 app.post('/cadastro', async (req, res) => {
     try {

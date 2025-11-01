@@ -45,8 +45,28 @@
 .popup-detalhes-col-esq {
     flex-basis: 40%;
 }
+
+.popup-detalhes-col-esq h6 {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.popup-detalhes-col-esq p {
+    color: #FFFFFF;
+    font-size: 9px;
+    margin-top: 20px;
+    width: 260px;
+    text-align: center;
+}
+
 .popup-detalhes-col-dir {
     flex-basis: 60%;
+}
+
+.popup-file-btn {
+    display: none;
 }
 
 .popup-detalhes-upload-area {
@@ -54,17 +74,19 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 180px;
-    border: 2px dashed #83a1da;
+    width: 220px;
+    height: 220px;
+    margin-top: 25px;
+    margin-left: 16px;
     border-radius: 16px;
     cursor: pointer;
-    background-color: #aebee2;
 }
-.popup-detalhes-upload-area ion-icon {
-    font-size: 24px;
-    color: #83a1da;
+
+.popup-detalhes-upload-area img {
+    width: 250px;
+    height: 250px;
 }
+
 .popup-detalhes-upload-area span {
     width: 100px;
     height:40px;
@@ -103,6 +125,7 @@
     background-color: #FFFFFF;
     box-sizing: border-box; 
     font-size: 14px;
+    font-family: "Quicksand", sans-serif;
 }
 .popup-detalhes-campo textarea {
     height: 100px;
@@ -145,4 +168,52 @@
     background: transparent;
     border: #ffffff 2px solid;
     color: #FFFFFF;
+}
+
+#editar-excluir-container {
+    position: fixed;
+    z-index: 2100;
+    width: 160px;
+    background: rgba(3, 28, 82, 0.5);
+    border: 2px solid #FFFFFF;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform .15s ease, opacity .15s ease;
+    transform-origin: top left;
+}
+
+#editar-excluir-container.popup-escondido {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+#editar-excluir-container button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-family: "Quicksand", sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+}
+
+#editar-excluir-container button:first-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#editar-excluir-container button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#editar-excluir-container ion-icon {
+    font-size: 20px;
 }
