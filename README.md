@@ -68,7 +68,7 @@ O objetivo do projeto é **promover a inclusão e acessibilidade urbana**, crian
 
 ## 🔍 Melhorias Futuras
 
-8 Implementação de Banco de Dados para armazenar pontos e usuários.
+* Implementação de Banco de Dados para armazenar pontos e usuários.
 
 * Funcionalidade de colaboração em tempo real, permitindo que múltiplos usuários visualizem e registrem informações simultaneamente.
 
@@ -80,6 +80,6 @@ O objetivo do projeto é **promover a inclusão e acessibilidade urbana**, crian
 
 ## 🌐 Contato
 
-🔗 LinkedIn: linkedin.com/in/maria-fernanda-soares
+🔗 **LinkedIn**: [Maria Fernanda](linkedin.com/in/maria-fernanda-soares-silva)
 💻 **GitHub:** [mariasoaresv](https://github.com/mariasoaresv)
 🌍 **Repositório:** [Mapa de Acessibilidade Urbana](https://github.com/mariasoaresv/Mapa-acessibilidade-interativo)
