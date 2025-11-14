@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cadastrarLink = document.querySelector('.cadastrar-link');
     const loginPopup = document.querySelector('.login');
     const iconClose = document.querySelector('.icon-close');
+    const sucessoCadastro = document.getElementById('sucesso-cadastro');
 
     loginPopup.addEventListener('click', () => {
         wrapper.classList.add('active-popup');
@@ -49,10 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert(data.message);
-
                     sessionStorage.setItem('usuarioLogado', JSON.stringify(data.user));
-
                     wrapper.classList.remove('active-popup'); 
                     window.location.href = 'mapa.html'; //redireciona para a página de mapa
                     
@@ -75,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const nome = document.getElementById('cadastro-nome').value;
             const email = document.getElementById('cadastro-email').value;
             const senha = document.getElementById('cadastro-senha').value;
+            
 
             try {
                 // Envia os dados para o /cadastro no server.js
@@ -87,8 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert(data.message);
                     wrapper.classList.remove('active'); // Volta para a tela de login
+
+                    if (sucessoCadastro) {
+                        sucessoCadastro.classList.add('mostrar-sucesso');
+                        
+                        // Esconde a mensagem após 5 segundos
+                        setTimeout(() => {
+                            sucessoCadastro.classList.remove('mostrar-sucesso');
+                        }, 5000); 
+                    }
                 } else {
                     alert(data.message);
                 }

@@ -25,7 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let map;
 
     if (document.getElementById('mapa-container')) {
-        map = L.map('mapa-container').setView([20, 0], 2);
+
+        const southWest = L.latLng(-90, -180); 
+        const northEast = L.latLng(90, 180); 
+        const bounds = L.latLngBounds(southWest, northEast);
+
+        map = L.map('mapa-container' , {
+            minZoom: 2,
+            maxBounds: bounds,
+            maxBoundsViscosity: 1.0
+        }).setView([20, 0], 2);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
